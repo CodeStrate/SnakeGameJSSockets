@@ -9,12 +9,38 @@ socket.on('gameState', handleGameState);
 socket.on('gameOver', handleGameOver);
 
 const gameScreen = document.getElementById('gameScreen');
+const initialScreen = document.getElementById('initialScreen');
+const newGameButton = document.getElementById('newGameButton');
+const joinGameButton = document.getElementById('joinGameButton');
+const gameCodeInput = document.getElementById('gameCodeInput');
+
+newGameButton.addEventListener('click', newGame);
+
+joinGameButton.addEventListener('click', joinGame);
+
+function newGame(){
+    socket.emit('newGame');
+    init();
+}
+
+function joinGame(){
+    //get code
+    const code = gameCodeInput.value;
+    socket.emit('joinGame' , code); //send joingame to server with the code.
+    init();
+}
+
 
 let canvas , ctx;
 
 // gamestate moved to server side
 
 function init() {
+    //switch screens
+    initialScreen.style.display = 'none';
+    gameScreen.style.display = 'block';
+
+    
     canvas = document.getElementById("canvas");
     ctx = canvas.getContext('2d');
 
@@ -31,7 +57,7 @@ function init() {
 function keydown(e){
     socket.emit('keydown', e.keyCode);
 }
-init();
+// init(); now we move to multiplayer.
 
 
 function paintGame(state){
