@@ -7,12 +7,16 @@ const socket = io('http://localhost:3000');
 socket.on('init', handleInit);
 socket.on('gameState', handleGameState);
 socket.on('gameOver', handleGameOver);
+socket.on('gameCode', handleGameCode);
 
+
+//from the html side
 const gameScreen = document.getElementById('gameScreen');
 const initialScreen = document.getElementById('initialScreen');
 const newGameButton = document.getElementById('newGameButton');
 const joinGameButton = document.getElementById('joinGameButton');
 const gameCodeInput = document.getElementById('gameCodeInput');
+const gameCodeDisplay = document.getElementById('gameCodeDisplay');
 
 newGameButton.addEventListener('click', newGame);
 
@@ -32,6 +36,8 @@ function joinGame(){
 
 
 let canvas , ctx;
+// init playerNumber
+let playerNumber;
 
 // gamestate moved to server side
 
@@ -84,8 +90,8 @@ function paintPlayer(playerState, size, colour){
 }
 
 
-function handleInit(msg){
-    console.log(msg);
+function handleInit(number){
+    playerNumber = number;
 }
 
 
@@ -97,4 +103,8 @@ function handleGameState(gameState){
 
 function handleGameOver(){
     alert("Lose!");
+}
+
+function handleGameCode(gameCode){
+    gameCodeDisplay.innerText = gameCode;
 }

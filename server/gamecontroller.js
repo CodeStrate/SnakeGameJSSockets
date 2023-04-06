@@ -98,8 +98,16 @@ function getUpdatedVelocity(keyCode){
     }
 }
 
+function initGame(){
+    const state = createGameState();
+    randomFood(state);
+    return state;  
+
+    //now for every client the food spawns differently.
+}
+
 module.exports = {
-    createGameState,
+    initGame,
     gameLoop,
     getUpdatedVelocity,
 }
