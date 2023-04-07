@@ -43,6 +43,8 @@ function joinGame(){
 let canvas , ctx;
 // init playerNumber
 let playerNumber;
+//check for game is active
+let gameActive;
 
 // gamestate moved to server side
 
@@ -61,6 +63,7 @@ function init() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     document.addEventListener('keydown', keydown);
+    gameActive = true;
 
 }
 
@@ -103,12 +106,15 @@ function handleInit(number){
 
 
 function handleGameState(gameState){
+    if(!gameActive) return;
     gameState = JSON.parse(gameState); //since gamestate comes down to the server as a string
     requestAnimationFrame(() => paintGame(gameState)); //request expects a function so i gave a inline/anonymous one which calls paintGame
     
 }
 
 function handleGameOver(data){
+    if(!gameActive) return;
+
     data = JSON.parse(data);
 
     if(data.winner === playerNumber){
@@ -116,6 +122,8 @@ function handleGameOver(data){
     }else{
         alert("You Lose!");
     }
+
+    gameActive = false;
     
 }
 
