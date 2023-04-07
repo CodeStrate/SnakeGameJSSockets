@@ -1,5 +1,8 @@
+const { initGame } = require("../server/gamecontroller");
+
 const BG_COLOUR = "#002233";
 const SNAKE_COLOUR = "#cceeff";
+const SNAKE_COLOUR_1 = "#dadbbb";
 const FOOD_COLOUR = "#ff4d4d";
 
 const socket = io('http://localhost:3000');
@@ -8,6 +11,8 @@ socket.on('init', handleInit);
 socket.on('gameState', handleGameState);
 socket.on('gameOver', handleGameOver);
 socket.on('gameCode', handleGameCode);
+socket.on('unknownGame', handleUnknownGame);
+socket.on('tooManyPlayers', handleTooManyPlayers);
 
 
 //from the html side
@@ -77,7 +82,9 @@ function paintGame(state){
     ctx.fillStyle = FOOD_COLOUR;
     ctx.fillRect(food.x * size, food.y * size, size, size);
 
-    paintPlayer(state.player, size, SNAKE_COLOUR);
+    paintPlayer(state.players[0], size, SNAKE_COLOUR);
+
+    paintPlayer(state.players[1], size, SNAKE_COLOUR_1);
 }
 
 function paintPlayer(playerState, size, colour){
@@ -101,10 +108,36 @@ function handleGameState(gameState){
     
 }
 
-function handleGameOver(){
-    alert("Lose!");
+function handleGameOver(data){
+    data = JSON.parse(data);
+
+    if(data.winner === playerNumber){
+        alert("You Win!")
+    }else{
+        alert("You Lose!");
+    }
+    
 }
 
 function handleGameCode(gameCode){
     gameCodeDisplay.innerText = gameCode;
+}
+
+function handleUnknownGame(){
+    resetUI();
+    alert("Unknown Game Code");
+}
+
+function handleTooManyPlayers(){
+    resetUI();
+    alert("Room Full");
+}
+
+function resetUI(){
+    playerNumber = null;
+    gameCodeInput.value = "";
+    gameCodeDisplay.innerText = "";
+    //show initialScreen
+    initialScreen.style.display = "block";
+    gameScreen.style.display = "none";
 }

@@ -95,6 +95,10 @@ io.on('connection', client => {
     }
 
     function handleKeyDown(keyCode){
+        const roomID = clientRooms[client.id];
+
+        if(!roomID) return;
+
         try {
             //parse str code to int
             keyCode = parseInt(keyCode);
@@ -105,7 +109,10 @@ io.on('connection', client => {
 
         const vel = getUpdatedVelocity(keyCode);
 
-        if(vel) state.player.velocity = vel;
+        if(vel){
+            state[roomID].players[client.number - 1].velocity = vel;
+            // state.player.velocity = vel;
+        }
     }
 
     // startGameInterval(client, state); since we implemented multiplayer we don't need it to start immediately now.
@@ -118,12 +125,26 @@ function startGameInterval(roomID){
         const winner = gameLoop(state[roomID]); // returns 0 so game continues and 1 if lose in single player, changed to reflect room 
 
         if(!winner){
-            client.emit('gameState' , JSON.stringify(state));
+            // client.emit('gameState' , JSON.stringify(state));
+            emitGameState(roomID, state);
         } else {
-            client.emit('gameOver');
+            emitGameOver(roomID, winner);
+            //reset state
+            state[roomID] = null;
+            // client.emit('gameOver'); we don't need it anymore
             clearInterval(intervalID);
         }
     }, 1000 / FRAME_RATE);  // 1000 / framerate gives the waiting time for server between each frame
+}
+
+function emitGameState(roomID, state){
+    // emit gameover to all clients in that room
+    io.sockets.in[roomID].emit('gameState', JSON.stringify(state));
+}
+
+function emitGameOver(roomID, winner){
+    io.sockets.in[roomID]
+    .emit('gameOver', JSON.stringify({winner}));
 }
 
 io.listen(3000);
