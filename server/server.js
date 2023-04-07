@@ -32,8 +32,9 @@ io.on('connection', client => {
     client.on('joinGame', handleJoinGame);
     
     function handleNewGame(){
-        let roomID = generateID(6);
+        let roomID = generateID(5);
         clientRooms[client.id] = roomID;
+        // console.log(clientRooms);
         //give code to client
         client.emit('gameCode', roomID);
 
@@ -50,31 +51,32 @@ io.on('connection', client => {
         client.emit('init', 1);
     }
 
-    function handleJoinGame(gameCode){
+    function handleJoinGame(roomID){
         //check if game exists
         // grab a room
-        const room = io.sockets.adapter.rooms[gameCode];
+        const room = io.sockets.adapter.rooms.get(roomID);
 
         //let all users in the server
 
         let allUsers;
 
         if (room){
-            allUsers = room.sockets; //gets all users currently in the room socket.
+            allUsers = room.size; //gets all users currently in the room socket.
         }
 
         //check how many clients
 
         let numberOfClients = 0;
 
-        if (allUsers){
-            numberOfClients = Object.keys(allUsers).length; //get length of keys in the allusers object.
+        if (room){
+            numberOfClients = allUsers; //get length of keys in the allusers object.
         }
 
         //unknown room
         if(numberOfClients === 0){
             client.emit('unknownGame');
             return;
+            
         }else if (numberOfClients > 1) {// more than a player
             //currently cant handle more than 1 in join
             client.emit('tooManyPlayers');
@@ -84,13 +86,13 @@ io.on('connection', client => {
 
         // now we expect we have exactly 1 client waiting to join
 
-        clientRooms[client.id] = gameCode;
-        client.join(gameCode);
+        clientRooms[client.id] = roomID;
+        client.join(roomID);
         //make it player 2
         client.number = 2;
         client.emit('init', 2); //give the game to player 2 as well.
 
-        startGameInterval(gameCode); //for more than 1 player we need intervals. now we dont need state anymore just gameCode can fetch us all socket clients.
+        startGameInterval(roomID); //for more than 1 player we need intervals. now we dont need state anymore just gameCode can fetch us all socket clients.
 
     }
 
@@ -126,7 +128,7 @@ function startGameInterval(roomID){
 
         if(!winner){
             // client.emit('gameState' , JSON.stringify(state));
-            emitGameState(roomID, state);
+            emitGameState(roomID, state[roomID]);
         } else {
             emitGameOver(roomID, winner);
             //reset state
@@ -137,14 +139,15 @@ function startGameInterval(roomID){
     }, 1000 / FRAME_RATE);  // 1000 / framerate gives the waiting time for server between each frame
 }
 
-function emitGameState(roomID, state){
+function emitGameState(room, gameState){
     // emit gameover to all clients in that room
-    io.sockets.in[roomID].emit('gameState', JSON.stringify(state));
+    io.sockets.in(room)
+    .emit('gameState', JSON.stringify(gameState));
 }
 
-function emitGameOver(roomID, winner){
-    io.sockets.in[roomID]
+function emitGameOver(room, winner){
+    io.sockets.in(room)
     .emit('gameOver', JSON.stringify({winner}));
 }
 
-io.listen(3000);
+io.listen(process.env.PORT || 3000);

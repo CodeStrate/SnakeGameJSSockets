@@ -1,44 +1,48 @@
 const { GRID_SCALE } = require('./constants');
 
-function createGameState(){
-    return {
-        players: [{
-            position: {
-                x: 3,
-                y: 10,
-            },
-            velocity: {
-                x: 1,
-                y: 0,
-            },
-            snake: [
-                {x:1, y: 10},
-                {x:2, y: 10},
-                {x:3, y: 10},
-    
-            ],
-        },{
-            position: {
-                x: 18,
-                y: 10,
-            },
-            velocity: {
-                x: 0,
-                y: 0,
-            },
-            snake: [
-                {x:20, y: 10},
-                {x:19, y: 10},
-                {x:18, y: 10},
-    
-            ],
-        }],
-        food: {
-           //food is empty now
-        },
-        gridSize: GRID_SCALE,
-    };
+function initGame(){
+    const state = createGameState();
+    randomFood(state);
+    return state;  
+
+    //now for every client the food spawns differently.
 }
+
+function createGameState() {
+    return {
+      players: [{
+        position: {
+          x: 3,
+          y: 10,
+        },
+        velocity: {
+          x: 1,
+          y: 0,
+        },
+        snake: [
+          {x: 1, y: 10},
+          {x: 2, y: 10},
+          {x: 3, y: 10},
+        ],
+      }, {
+        position: {
+          x: 18,
+          y: 10,
+        },
+        velocity: {
+          x: 0,
+          y: 0,
+        },
+        snake: [
+          {x: 20, y: 10},
+          {x: 19, y: 10},
+          {x: 18, y: 10},
+        ],
+      }],
+      food: {}, //food is empty now
+      gridsize: GRID_SCALE,
+    };
+  }
 
 function gameLoop(state){
     if(!state) return;
@@ -49,6 +53,9 @@ function gameLoop(state){
 
     playerOne.position.x += playerOne.velocity.x;
     playerOne.position.y += playerOne.velocity.y;
+
+    playerTwo.position.x += playerTwo.velocity.x;
+    playerTwo.position.y += playerTwo.velocity.y;
 
     //constrain to canvas
     if(playerOne.position.x < 0 || playerOne.position.x > GRID_SCALE || playerOne.position.y < 0 || playerOne.position.y > GRID_SCALE){
@@ -143,13 +150,6 @@ function getUpdatedVelocity(keyCode){
     }
 }
 
-function initGame(){
-    const state = createGameState();
-    randomFood(state);
-    return state;  
-
-    //now for every client the food spawns differently.
-}
 
 module.exports = {
     initGame,

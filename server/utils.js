@@ -10,7 +10,7 @@ function generateID(length){
     var charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     var charsetLength = charset.length;
 
-    for (let index = 0; index < charsetLength; index++) {
+    for (var index = 0; index < length; index++) {
         //add random characters to result
         result += charset.charAt(Math.floor(Math.random() * charsetLength));
         

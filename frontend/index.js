@@ -1,5 +1,3 @@
-const { initGame } = require("../server/gamecontroller");
-
 const BG_COLOUR = "#002233";
 const SNAKE_COLOUR = "#cceeff";
 const SNAKE_COLOUR_1 = "#dadbbb";
@@ -44,7 +42,7 @@ let canvas , ctx;
 // init playerNumber
 let playerNumber;
 //check for game is active
-let gameActive;
+let gameActive = false;
 
 // gamestate moved to server side
 
@@ -144,7 +142,6 @@ function handleTooManyPlayers(){
 function resetUI(){
     playerNumber = null;
     gameCodeInput.value = "";
-    gameCodeDisplay.innerText = "";
     //show initialScreen
     initialScreen.style.display = "block";
     gameScreen.style.display = "none";
